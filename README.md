@@ -36,17 +36,17 @@ flowchart TD
     %% Audio & Control Connections
     Mic -->|Audio Stream| VAD
     VAD -->|Active Speech Confirmed| STT
-    VAD -.->|User Starts Talking (Barge-in)| TTS
+    VAD -.->|"User Starts Talking (Barge-in)"| TTS
     STT -->|Transcribed Text| AgentCore
 
     %% Grounding & Escalation
     AgentCore -->|Query Trading Rules| KBTool
     KBTool --> Retriever
     Retriever --> Qdrant
-    Retriever -->|Confidence >= Threshold| KBTool
+    Retriever -->|"Confidence >= Threshold"| KBTool
     KBTool -->|Verified Context| AgentCore
 
-    Retriever -.->|Confidence < Threshold / Ambiguous| EscalationTool
+    Retriever -.->|"Confidence < Threshold / Ambiguous"| EscalationTool
     EscalationTool -->|Initiate Human Handoff| AgentCore
 
     %% Streaming Output
