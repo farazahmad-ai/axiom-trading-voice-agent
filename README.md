@@ -10,27 +10,27 @@ Built with **LiveKit WebRTC**, **Groq (Llama 3.3 70B)**, **Docling Hierarchical 
 
 ```mermaid
 flowchart TD
-    subgraph Client["Trader / User"]
-        Mic["Microphone (WebRTC Audio In)"]
-        Speaker["Speaker (WebRTC Audio Out)"]
+    subgraph Client [Trader and User]
+        Mic[Microphone Audio In]
+        Speaker[Speaker Audio Out]
     end
 
-    subgraph LiveKit["LiveKit Room and Real-Time Engine"]
-        VAD["Silero VAD (Voice Activity Detection)"]
-        AudioBuffer["WebRTC Audio Stream Manager"]
+    subgraph LiveKit [LiveKit Real-Time Engine]
+        VAD[Silero Voice Activity Detection]
+        AudioBuffer[WebRTC Audio Stream Manager]
     end
 
-    subgraph Pipeline["Voice Pipeline Core (agent.py)"]
-        STT["STT Engine: Deepgram Nova-3"]
-        AgentCore["LLM Orchestrator (Llama 3.3-70B via Groq)"]
-        TTS["TTS Engine: Inworld Streaming Voice"]
+    subgraph Pipeline [Voice Pipeline Core]
+        STT[Deepgram Nova-3 STT]
+        AgentCore[Groq Llama 3.3-70B Orchestrator]
+        TTS[Inworld Streaming TTS]
     end
 
-    subgraph Knowledge["LangChain Grounding and Tools"]
-        KBTool["search_trading_rules Tool"]
-        Retriever["Cosine Similarity Search"]
-        Qdrant["Qdrant Vector Database"]
-        EscalationTool["escalate_to_human Tool (Ticket Generator)"]
+    subgraph Knowledge [LangChain Grounding and Tools]
+        KBTool[Trading Rules Tool]
+        Retriever[Cosine Similarity Search]
+        Qdrant[Qdrant Vector Database]
+        EscalationTool[Human Escalation Tool]
     end
 
     Mic -->|Audio Stream| VAD
@@ -38,17 +38,17 @@ flowchart TD
     VAD -.->|Barge-in Interrupt| TTS
     STT -->|Transcribed Text| AgentCore
 
-    AgentCore -->|Query Trading Rules| KBTool
+    AgentCore -->|Query Rules| KBTool
     KBTool --> Retriever
     Retriever --> Qdrant
     Retriever -->|High Confidence| KBTool
     KBTool -->|Verified Context| AgentCore
 
-    Retriever -.->|Low Confidence / Ambiguous| EscalationTool
-    EscalationTool -->|Initiate Human Handoff| AgentCore
+    Retriever -.->|Low Confidence| EscalationTool
+    EscalationTool -->|Support Ticket| AgentCore
 
-    AgentCore -->|Streaming Spoken Tokens| TTS
-    TTS -->|Streaming Audio Chunks| AudioBuffer
+    AgentCore -->|Spoken Tokens| TTS
+    TTS -->|Audio Chunks| AudioBuffer
     AudioBuffer -->|WebRTC Audio Stream| Speaker
 ```
 
