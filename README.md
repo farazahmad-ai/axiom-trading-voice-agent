@@ -15,41 +15,38 @@ flowchart TD
         Speaker["Speaker (WebRTC Audio Out)"]
     end
 
-    subgraph LiveKit["LiveKit Room & Real-Time Engine"]
-        VAD["Silero VAD (Voice Activity Detection)<br/>• Detects speech start (Barge-in / Interrupt)<br/>• Detects speech stop (Immediate pickup)"]
+    subgraph LiveKit["LiveKit Room and Real-Time Engine"]
+        VAD["Silero VAD (Voice Activity Detection)"]
         AudioBuffer["WebRTC Audio Stream Manager"]
     end
 
     subgraph Pipeline["Voice Pipeline Core (agent.py)"]
-        STT["STT Engine: Deepgram Nova-3<br/>Sub-250ms Audio Transcription"]
-        AgentCore["VoicePipelineAgent & LLM Orchestrator<br/>(Llama 3.3-70B via Groq)"]
-        TTS["TTS Engine: Inworld TTS<br/>Low-Latency Streaming Voice Synthesis"]
+        STT["STT Engine: Deepgram Nova-3"]
+        AgentCore["LLM Orchestrator (Llama 3.3-70B via Groq)"]
+        TTS["TTS Engine: Inworld Streaming Voice"]
     end
 
-    subgraph Knowledge["LangChain Grounding & Tools (tools.py & retriever.py)"]
+    subgraph Knowledge["LangChain Grounding and Tools"]
         KBTool["search_trading_rules Tool"]
-        Retriever["Cosine Similarity Search (Sentence-Transformers)"]
-        Qdrant[("Qdrant Vector DB<br/>(Embedded Storage)")]
-        EscalationTool["escalate_to_human Tool<br/>(Auto-generates AXIOM-XXXXX Support Ticket)"]
+        Retriever["Cosine Similarity Search"]
+        Qdrant["Qdrant Vector Database"]
+        EscalationTool["escalate_to_human Tool (Ticket Generator)"]
     end
 
-    %% Audio & Control Connections
     Mic -->|Audio Stream| VAD
-    VAD -->|Active Speech Confirmed| STT
-    VAD -.->|"User Starts Talking (Barge-in)"| TTS
+    VAD -->|Active Speech| STT
+    VAD -.->|Barge-in Interrupt| TTS
     STT -->|Transcribed Text| AgentCore
 
-    %% Grounding & Escalation
     AgentCore -->|Query Trading Rules| KBTool
     KBTool --> Retriever
     Retriever --> Qdrant
-    Retriever -->|"Confidence >= Threshold"| KBTool
+    Retriever -->|High Confidence| KBTool
     KBTool -->|Verified Context| AgentCore
 
-    Retriever -.->|"Confidence < Threshold / Ambiguous"| EscalationTool
+    Retriever -.->|Low Confidence / Ambiguous| EscalationTool
     EscalationTool -->|Initiate Human Handoff| AgentCore
 
-    %% Streaming Output
     AgentCore -->|Streaming Spoken Tokens| TTS
     TTS -->|Streaming Audio Chunks| AudioBuffer
     AudioBuffer -->|WebRTC Audio Stream| Speaker
