@@ -1,0 +1,30 @@
+# Environment & Secrets
+.env
+.env.local
+*.env
+AGENTS.md
+
+# Python & Virtual Environments
+.venv/
+env/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Build & Packaging
+build/
+dist/
+*.egg-info/
+
+# Local Vector Storage & Data
+data/
+*.qdrant
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

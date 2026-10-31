@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prop-trading-rules-voice-agent"
+version = "1.0.0"
+description = "Voice-enabled AI assistant for Axiom Prop Trading Rules"
+requires-python = ">=3.12"
+
+dependencies = [
+    # LiveKit & Voice
+    "livekit-agents>=1.0",
+    "livekit-plugins-deepgram",
+    "livekit-plugins-inworld",
+    "livekit-plugins-langchain",
+
+    # LangChain & LLM
+    "langchain",
+    "langchain-groq",
+
+    # Vector DB & Embeddings
+    "qdrant-client",
+    "sentence-transformers",
+
+    # Document Processing
+    "docling",
+
+    # Utilities
+    "python-dotenv",
+    "pydantic-settings",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prop_trading_rules_voice_agent"]
